@@ -4,8 +4,14 @@ const Box = styled.div`
   background: #FFFFFF;
   border-radius: 8px;
   padding: 16px;
- 
   margin-bottom: 10px;
+
+  .Link{
+    font-size: 14px;
+    color: #4895ef;
+    text-decoration: none;
+    font-weight: 800;
+  }
   .boxLink {
     font-size: 14px;
     color: #2E7BB4;
@@ -53,7 +59,7 @@ const Box = styled.div`
     padding: 8px 12px;
     color: #FFFFFF;
     border-radius: 10000px;
-    background-color: #6F92BB;
+    background-color: #4895ef;
   }
 `;
 

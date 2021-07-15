@@ -3,6 +3,8 @@ import MainGrid from '../src/components/MainGrid';
 import Box from '../src/components/Box';
 import { AlurakutMenu, AlurakutProfileSidebarMenuDefault, OrkutNostalgicIconSet } from '../src/lib/AluraCommos';
 import { ProfileRelationsBoxWrapper } from '../src/components/ProfileRelations';
+import { BoxRepository } from '../src/components/BoxRepository';
+
 
 function ProfileSidebar(props) {
   return (
@@ -17,22 +19,88 @@ function ProfileSidebar(props) {
       <hr />
       <AlurakutProfileSidebarMenuDefault />
     </Box>
-  )
+  );
+}
+
+function ProfileRelationsBoxFollowers(props) {
+  const viewReduced = props.items.slice(0, 6);
+  return (
+    <ProfileRelationsBoxWrapper>
+
+      <h2 className='smallTitle'>
+        {props.title} ({props.items.length})
+      </h2>
+      <ul>
+        {viewReduced.map((itemAtual) => {
+          return (
+            <li key={itemAtual.items}>
+              <a href={itemAtual.html_url} target="_blank">
+                <img src={itemAtual.avatar_url} />
+                {<span>{itemAtual.login}</span>}
+              </a>
+            </li>
+          )
+        })}
+      </ul>
+      <hr />
+      <a href={"/page_followers"} className="Link">
+        Ver mais
+      </a>
+    </ProfileRelationsBoxWrapper>
+  );
+}
+
+function ProfileRelationsBoxRepository(props) {
+  const viewReduced = props.items.slice(0, 6);
+  return (
+    <BoxRepository>
+      <h2 className='smallTitle'>
+        {props.title} ({props.items.length})
+      </h2>
+      <ul>
+        {viewReduced.map((itemAtual) => {
+          return (
+            <li key={itemAtual.id}>
+              <a href={itemAtual.html_url} target="_blank">
+                {<span className="smallTitle">{itemAtual.name}</span>}
+              </a>
+            </li>
+          )
+        })}
+      </ul>
+      <hr />
+      <a href={"/page_repository"} className="Link">
+        Ver mais
+      </a>
+    </BoxRepository>
+  );
 }
 
 export default function Home() {
-  const [comunidades, setComunidades] = React.useState([{
-    id: "123456789",
-    title: "eu odeio acordar cedo",
-    image: "https://alurakut.vercel.app/capa-comunidade-01.jpg"
-  }]);
+  const [comunidades, setComunidades] = React.useState([]);
+  const [seguidores, setSeguidores] = React.useState([]);
   const githubUser = "ManoelEduardo";
-  const pessoasFavoritas = [
-    'juunegreiros',
-    'omariosouto',
-    'rocketseat',
-    'peas'
-  ];
+
+  React.useEffect(() => {
+    fetch(`https://api.github.com/users/${githubUser}/followers`)
+      .then((response) => {
+        return response.json();
+      })
+      .then((res) => {
+        setSeguidores(res);
+      })
+    //Fetch do repositório 
+    fetch(`https://api.github.com/users/${githubUser}/repos`)
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        setComunidades(data);
+
+      })
+
+  }, [])
+
 
   return (
     <>
@@ -61,7 +129,7 @@ export default function Home() {
                 title: dadosDoForm.get('title'),
                 image: dadosDoForm.get('image'),
               }
-              
+
               const updateComunidades = [...comunidades, comunidade]
               setComunidades(updateComunidades);
             }}>
@@ -88,38 +156,8 @@ export default function Home() {
         </div>
 
         <div>
-          <ProfileRelationsBoxWrapper>
-            <ul>
-              {comunidades.map((itemAtual) => {
-                return (
-                  <li key={itemAtual.id}>
-                    <a href={`/users/${itemAtual.title}`}>
-                      <img src={itemAtual.image} />
-                      <span>{itemAtual.title}</span>
-                    </a>
-                  </li>
-                )
-              })}
-            </ul>
-          </ProfileRelationsBoxWrapper>
-          <ProfileRelationsBoxWrapper>
-
-            <h2 className='smallTitle'>
-              Pessoas da comunidade ({pessoasFavoritas.length})
-            </h2>
-            <ul>
-              {pessoasFavoritas.map((itemAtual) => {
-                return (
-                  <li key={itemAtual}>
-                    <a href={`/users/${itemAtual}`}>
-                      <img src={`https://github.com/${itemAtual}.png`} />
-                      <span>{itemAtual}</span>
-                    </a>
-                  </li>
-                )
-              })}
-            </ul>
-          </ProfileRelationsBoxWrapper>
+          <ProfileRelationsBoxFollowers title="Seguidores GitHub" items={seguidores} />
+          <ProfileRelationsBoxRepository title="Repositórios" items={comunidades} />
         </div>
 
       </MainGrid>
